@@ -3,10 +3,11 @@ import "./App.css";
 import { ThemeContext } from "./ThemeContext";
 import { StatsCard } from "./components/StatsCard";
 
+// Get API base from environment, fallback to /api for local dev
+const API_BASE = import.meta.env.VITE_API_BASE || "/api/profile";
+
 const emptyEducation = { degree: "", college: "", year: "" };
 const emptyProject = { name: "", description: "", techStack: "", link: "" };
-
-const API_BASE = "/api/profile";
 
 export default function App() {
   const { isDark, toggleTheme } = useContext(ThemeContext);
@@ -32,7 +33,7 @@ export default function App() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await fetch(API_BASE);
+        const res = await fetch(`${API_BASE}`);
         const data = await res.json();
 
         setProfile({
@@ -108,7 +109,7 @@ export default function App() {
     };
 
     showSaveMessage(
-      fetch(API_BASE, {
+      fetch(`${API_BASE}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
