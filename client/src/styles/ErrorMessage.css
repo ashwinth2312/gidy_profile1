@@ -1,0 +1,52 @@
+.errorMessage {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #991b1b;
+  animation: slideDown 0.2s ease-out;
+}
+
+:root[data-theme="dark"] .errorMessage {
+  background-color: #7f1d1d;
+  border-color: #991b1b;
+  color: #fecaca;
+}
+
+.errorIcon {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.errorText {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.input.hasError,
+.textarea.hasError {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+:root[data-theme="dark"] .input.hasError,
+:root[data-theme="dark"] .textarea.hasError {
+  background-color: #7f1d1d;
+  border-color: #ef4444;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

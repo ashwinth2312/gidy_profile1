@@ -1,0 +1,159 @@
+.alertOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.alertDialog {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  width: 90%;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.alertHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.alertTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.alertClose {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.alertClose:hover {
+  background-color: var(--border-color);
+}
+
+.alertBody {
+  padding: 20px;
+}
+
+.alertMessage {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.alertFooter {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-color);
+  justify-content: flex-end;
+}
+
+.alertBtn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.alertBtnCancel {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.alertBtnCancel:hover {
+  background-color: var(--border-color);
+  opacity: 0.8;
+}
+
+.alertBtnConfirm {
+  color: white;
+  min-width: 100px;
+}
+
+.alertBtnConfirm-info {
+  background-color: #3b82f6;
+}
+
+.alertBtnConfirm-info:hover {
+  background-color: #2563eb;
+}
+
+.alertBtnConfirm-success {
+  background-color: #10b981;
+}
+
+.alertBtnConfirm-success:hover {
+  background-color: #059669;
+}
+
+.alertBtnConfirm-warning {
+  background-color: #f59e0b;
+}
+
+.alertBtnConfirm-warning:hover {
+  background-color: #d97706;
+}
+
+.alertBtnConfirm-danger {
+  background-color: #ef4444;
+}
+
+.alertBtnConfirm-danger:hover {
+  background-color: #dc2626;
+}
+
+/* Dark mode adjustments */
+:root[data-theme="dark"] .alertDialog {
+  border-color: #404040;
+}
+
+:root[data-theme="dark"] .alertBtnCancel {
+  background-color: #404040;
+}
+
+:root[data-theme="dark"] .alertBtnCancel:hover {
+  background-color: #505050;
+}

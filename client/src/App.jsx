@@ -2,6 +2,9 @@ import { useEffect, useState, useContext } from "react";
 import "./App.css";
 import { ThemeContext } from "./ThemeContext";
 import { StatsCard } from "./components/StatsCard";
+import { AlertDialog } from "./components/AlertDialog";
+import { ErrorMessage } from "./components/ErrorMessage";
+import { useValidation } from "./hooks/useValidation";
 
 // Get API base from environment, fallback to /api for local dev
 const API_BASE = import.meta.env.VITE_API_BASE || "/api/profile";
@@ -11,8 +14,20 @@ const emptyProject = { name: "", description: "", techStack: "", link: "" };
 
 export default function App() {
   const { isDark, toggleTheme } = useContext(ThemeContext);
+  const { validateProfile, validateEducation, validateProject } = useValidation();
   const [loading, setLoading] = useState(true);
   const [savingMsg, setSavingMsg] = useState("");
+
+  // Alert Dialog State
+  const [alert, setAlert] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "info",
+    onConfirm: null,
+    confirmText: "Confirm",
+    cancelText: "Cancel",
+  });
 
   const [profile, setProfile] = useState({
     fullName: "",
@@ -24,8 +39,14 @@ export default function App() {
     links: { github: "", linkedin: "", portfolio: "" },
   });
 
+  const [profileErrors, setProfileErrors] = useState({});
+
   const [educationForm, setEducationForm] = useState(emptyEducation);
+  const [educationErrors, setEducationErrors] = useState({});
+
   const [projectForm, setProjectForm] = useState(emptyProject);
+  const [projectErrors, setProjectErrors] = useState({});
+
   const [educationList, setEducationList] = useState([]);
   const [projectsList, setProjectsList] = useState([]);
 
@@ -54,6 +75,11 @@ export default function App() {
         setProjectsList(data.projects || []);
       } catch (error) {
         console.error("Error fetching profile:", error);
+        showAlert(
+          "Error",
+          "Failed to load profile. Please check your connection.",
+          "danger"
+        );
       } finally {
         setLoading(false);
       }
@@ -61,6 +87,27 @@ export default function App() {
 
     fetchProfile();
   }, []);
+
+  // Show custom alert
+  const showAlert = (title, message, type = "info", onConfirm = null, confirmText = "Confirm") => {
+    setAlert({
+      isOpen: true,
+      title,
+      message,
+      type,
+      onConfirm,
+      confirmText,
+      cancelText: "Cancel",
+    });
+  };
+
+  // Close alert
+  const closeAlert = () => {
+    setAlert({
+      ...alert,
+      isOpen: false,
+    });
+  };
 
   const showSaveMessage = async (promise) => {
     setSavingMsg("Saving...");
@@ -80,6 +127,14 @@ export default function App() {
   const onChange = (e) => {
     const { name, value } = e.target;
     setProfile((prev) => ({ ...prev, [name]: value }));
+    // Clear error for this field when user starts typing
+    if (profileErrors[name]) {
+      setProfileErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   const onLinkChange = (e) => {
@@ -88,122 +143,220 @@ export default function App() {
       ...prev,
       links: { ...prev.links, [name]: value },
     }));
+    // Clear error for this field when user starts typing
+    if (profileErrors[name]) {
+      setProfileErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
+
+  const onEducationChange = (field, value) => {
+    setEducationForm((prev) => ({ ...prev, [field]: value }));
+    // Clear error for this field when user starts typing
+    if (educationErrors[field]) {
+      setEducationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+  };
+
+  const onProjectChange = (field, value) => {
+    setProjectForm((prev) => ({ ...prev, [field]: value }));
+    // Clear error for this field when user starts typing
+    if (projectErrors[field]) {
+      setProjectErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
   };
 
   const saveProfile = () => {
-    const payload = {
-      fullName: profile.fullName.trim(),
-      email: profile.email.trim(),
-      phone: profile.phone.trim(),
-      title: profile.title.trim(),
-      summary: profile.summary.trim(),
-      skills: profile.skills
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean),
-      links: {
-        github: profile.links.github.trim(),
-        linkedin: profile.links.linkedin.trim(),
-        portfolio: profile.links.portfolio.trim(),
-      },
-    };
+    const errors = validateProfile(profile);
 
-    showSaveMessage(
-      fetch(`${API_BASE}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }).then((res) => res.json())
+    if (Object.keys(errors).length > 0) {
+      setProfileErrors(errors);
+      showAlert(
+        "Validation Error",
+        "Please fix the errors in your profile before saving.",
+        "warning"
+      );
+      return;
+    }
+
+    showAlert(
+      "Save Profile",
+      "Are you sure you want to save this profile?",
+      "info",
+      () => {
+        const payload = {
+          fullName: profile.fullName.trim(),
+          email: profile.email.trim(),
+          phone: profile.phone.trim(),
+          title: profile.title.trim(),
+          summary: profile.summary.trim(),
+          skills: profile.skills
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+          links: {
+            github: profile.links.github.trim(),
+            linkedin: profile.links.linkedin.trim(),
+            portfolio: profile.links.portfolio.trim(),
+          },
+        };
+
+        showSaveMessage(
+          fetch(`${API_BASE}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }).then((res) => res.json())
+        );
+
+        closeAlert();
+      },
+      "Save"
     );
   };
 
   const addEducation = () => {
-    if (
-      !educationForm.degree.trim() ||
-      !educationForm.college.trim() ||
-      !educationForm.year.trim()
-    ) {
-      alert("Please fill in Degree, College, and Year");
+    const errors = validateEducation(educationForm);
+
+    if (Object.keys(errors).length > 0) {
+      setEducationErrors(errors);
+      showAlert(
+        "Validation Error",
+        "Please fix the errors in education form before adding.",
+        "warning"
+      );
       return;
     }
 
-    showSaveMessage(
-      fetch(`${API_BASE}/education`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          degree: educationForm.degree.trim(),
-          college: educationForm.college.trim(),
-          year: educationForm.year.trim(),
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          setEducationList(data.education || []);
-          setEducationForm(emptyEducation);
-          return data;
-        })
+    showAlert(
+      "Add Education",
+      `Add ${educationForm.degree} from ${educationForm.college} (${educationForm.year})?`,
+      "info",
+      () => {
+        showSaveMessage(
+          fetch(`${API_BASE}/education`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              degree: educationForm.degree.trim(),
+              college: educationForm.college.trim(),
+              year: educationForm.year.trim(),
+            }),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              setEducationList(data.education || []);
+              setEducationForm(emptyEducation);
+              setEducationErrors({});
+              return data;
+            })
+        );
+        closeAlert();
+      },
+      "Add"
     );
   };
 
   const addProject = () => {
-    if (!projectForm.name.trim() || !projectForm.description.trim()) {
-      alert("Please fill in Project Name and Description");
+    const errors = validateProject(projectForm);
+
+    if (Object.keys(errors).length > 0) {
+      setProjectErrors(errors);
+      showAlert(
+        "Validation Error",
+        "Please fix the errors in project form before adding.",
+        "warning"
+      );
       return;
     }
 
-    const payload = {
-      name: projectForm.name.trim(),
-      description: projectForm.description.trim(),
-      techStack: projectForm.techStack
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean),
-      link: projectForm.link.trim(),
-    };
+    showAlert(
+      "Add Project",
+      `Add project "${projectForm.name}" to your portfolio?`,
+      "info",
+      () => {
+        const payload = {
+          name: projectForm.name.trim(),
+          description: projectForm.description.trim(),
+          techStack: projectForm.techStack
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
+          link: projectForm.link.trim(),
+        };
 
-    showSaveMessage(
-      fetch(`${API_BASE}/projects`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          setProjectsList(data.projects || []);
-          setProjectForm(emptyProject);
-          return data;
-        })
+        showSaveMessage(
+          fetch(`${API_BASE}/projects`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              setProjectsList(data.projects || []);
+              setProjectForm(emptyProject);
+              setProjectErrors({});
+              return data;
+            })
+        );
+        closeAlert();
+      },
+      "Add"
     );
   };
 
-  const deleteEducation = (eduId) => {
-    if (!window.confirm("Are you sure you want to delete this education?")) return;
-
-    showSaveMessage(
-      fetch(`${API_BASE}/education/${eduId}`, {
-        method: "DELETE",
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          setEducationList(data.education || []);
-          return data;
-        })
+  const deleteEducation = (eduId, degree, college) => {
+    showAlert(
+      "Delete Education",
+      `Are you sure you want to delete "${degree} from ${college}"? This action cannot be undone.`,
+      "danger",
+      () => {
+        showSaveMessage(
+          fetch(`${API_BASE}/education/${eduId}`, {
+            method: "DELETE",
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              setEducationList(data.education || []);
+              return data;
+            })
+        );
+        closeAlert();
+      },
+      "Delete"
     );
   };
 
-  const deleteProject = (projectId) => {
-    if (!window.confirm("Are you sure you want to delete this project?")) return;
-
-    showSaveMessage(
-      fetch(`${API_BASE}/projects/${projectId}`, {
-        method: "DELETE",
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          setProjectsList(data.projects || []);
-          return data;
-        })
+  const deleteProject = (projectId, projectName) => {
+    showAlert(
+      "Delete Project",
+      `Are you sure you want to delete the project "${projectName}"? This action cannot be undone.`,
+      "danger",
+      () => {
+        showSaveMessage(
+          fetch(`${API_BASE}/projects/${projectId}`, {
+            method: "DELETE",
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              setProjectsList(data.projects || []);
+              return data;
+            })
+        );
+        closeAlert();
+      },
+      "Delete"
     );
   };
 
@@ -211,6 +364,20 @@ export default function App() {
 
   return (
     <div className="container">
+      {/* Alert Dialog */}
+      <AlertDialog
+        isOpen={alert.isOpen}
+        title={alert.title}
+        message={alert.message}
+        type={alert.type}
+        confirmText={alert.confirmText}
+        cancelText={alert.cancelText}
+        onConfirm={() => {
+          if (alert.onConfirm) alert.onConfirm();
+        }}
+        onCancel={closeAlert}
+      />
+
       <div className="topbar">
         <div className="brand">
           <div className="logo" />
@@ -238,57 +405,72 @@ export default function App() {
             </div>
 
             <div className="row2">
-              <input
-                className="input"
-                name="fullName"
-                value={profile.fullName}
-                onChange={onChange}
-                placeholder="Full Name"
-              />
-              <input
-                className="input"
-                name="title"
-                value={profile.title}
-                onChange={onChange}
-                placeholder="Title (e.g. Associate Software Developer)"
-              />
-              <input
-                className="input"
-                name="email"
-                value={profile.email}
-                onChange={onChange}
-                placeholder="Email"
-                type="email"
-              />
-              <input
-                className="input"
-                name="phone"
-                value={profile.phone}
-                onChange={onChange}
-                placeholder="Phone"
-                type="tel"
-              />
+              <div>
+                <input
+                  className={`input ${profileErrors.fullName ? "hasError" : ""}`}
+                  name="fullName"
+                  value={profile.fullName}
+                  onChange={onChange}
+                  placeholder="Full Name"
+                />
+                <ErrorMessage message={profileErrors.fullName} />
+              </div>
+              <div>
+                <input
+                  className={`input ${profileErrors.title ? "hasError" : ""}`}
+                  name="title"
+                  value={profile.title}
+                  onChange={onChange}
+                  placeholder="Title (e.g. Associate Software Developer)"
+                />
+                <ErrorMessage message={profileErrors.title} />
+              </div>
+              <div>
+                <input
+                  className={`input ${profileErrors.email ? "hasError" : ""}`}
+                  name="email"
+                  value={profile.email}
+                  onChange={onChange}
+                  placeholder="Email"
+                  type="email"
+                />
+                <ErrorMessage message={profileErrors.email} />
+              </div>
+              <div>
+                <input
+                  className={`input ${profileErrors.phone ? "hasError" : ""}`}
+                  name="phone"
+                  value={profile.phone}
+                  onChange={onChange}
+                  placeholder="Phone (optional)"
+                  type="tel"
+                />
+                <ErrorMessage message={profileErrors.phone} />
+              </div>
             </div>
 
             <div style={{ marginTop: 10 }}>
               <textarea
-                className="textarea"
+                className={`textarea ${profileErrors.summary ? "hasError" : ""}`}
                 name="summary"
                 value={profile.summary}
                 onChange={onChange}
                 placeholder="Summary"
               />
-              <p className="small">Tip: Keep summary 2–3 lines.</p>
+              <ErrorMessage message={profileErrors.summary} />
+              <p className="small">Tip: Keep summary 2–3 lines (10-500 characters).</p>
             </div>
 
-            <input
-              className="input"
-              name="skills"
-              value={profile.skills}
-              onChange={onChange}
-              placeholder="Skills (comma separated) e.g. Java, Node.js, MongoDB"
-              style={{ marginTop: 10 }}
-            />
+            <div style={{ marginTop: 10 }}>
+              <input
+                className={`input ${profileErrors.skills ? "hasError" : ""}`}
+                name="skills"
+                value={profile.skills}
+                onChange={onChange}
+                placeholder="Skills (comma separated) e.g. Java, Node.js, MongoDB"
+              />
+              <ErrorMessage message={profileErrors.skills} />
+            </div>
 
             <hr className="hr" />
 
@@ -298,33 +480,41 @@ export default function App() {
             </div>
 
             <div className="row2">
-              <input
-                className="input"
-                name="github"
-                value={profile.links.github}
-                onChange={onLinkChange}
-                placeholder="GitHub URL"
-                type="url"
-              />
-              <input
-                className="input"
-                name="linkedin"
-                value={profile.links.linkedin}
-                onChange={onLinkChange}
-                placeholder="LinkedIn URL"
-                type="url"
-              />
+              <div>
+                <input
+                  className={`input ${profileErrors.github ? "hasError" : ""}`}
+                  name="github"
+                  value={profile.links.github}
+                  onChange={onLinkChange}
+                  placeholder="GitHub URL (optional)"
+                  type="url"
+                />
+                <ErrorMessage message={profileErrors.github} />
+              </div>
+              <div>
+                <input
+                  className={`input ${profileErrors.linkedin ? "hasError" : ""}`}
+                  name="linkedin"
+                  value={profile.links.linkedin}
+                  onChange={onLinkChange}
+                  placeholder="LinkedIn URL (optional)"
+                  type="url"
+                />
+                <ErrorMessage message={profileErrors.linkedin} />
+              </div>
             </div>
 
-            <input
-              className="input"
-              name="portfolio"
-              value={profile.links.portfolio}
-              onChange={onLinkChange}
-              placeholder="Portfolio URL (optional)"
-              type="url"
-              style={{ marginTop: 10 }}
-            />
+            <div style={{ marginTop: 10 }}>
+              <input
+                className={`input ${profileErrors.portfolio ? "hasError" : ""}`}
+                name="portfolio"
+                value={profile.links.portfolio}
+                onChange={onLinkChange}
+                placeholder="Portfolio URL (optional)"
+                type="url"
+              />
+              <ErrorMessage message={profileErrors.portfolio} />
+            </div>
 
             <button
               className="btn btnPrimary"
@@ -342,30 +532,33 @@ export default function App() {
             </div>
 
             <div className="row3">
-              <input
-                className="input"
-                value={educationForm.degree}
-                onChange={(e) =>
-                  setEducationForm((prev) => ({ ...prev, degree: e.target.value }))
-                }
-                placeholder="Degree"
-              />
-              <input
-                className="input"
-                value={educationForm.college}
-                onChange={(e) =>
-                  setEducationForm((prev) => ({ ...prev, college: e.target.value }))
-                }
-                placeholder="College"
-              />
-              <input
-                className="input"
-                value={educationForm.year}
-                onChange={(e) =>
-                  setEducationForm((prev) => ({ ...prev, year: e.target.value }))
-                }
-                placeholder="Year"
-              />
+              <div>
+                <input
+                  className={`input ${educationErrors.degree ? "hasError" : ""}`}
+                  value={educationForm.degree}
+                  onChange={(e) => onEducationChange("degree", e.target.value)}
+                  placeholder="Degree"
+                />
+                <ErrorMessage message={educationErrors.degree} />
+              </div>
+              <div>
+                <input
+                  className={`input ${educationErrors.college ? "hasError" : ""}`}
+                  value={educationForm.college}
+                  onChange={(e) => onEducationChange("college", e.target.value)}
+                  placeholder="College/University"
+                />
+                <ErrorMessage message={educationErrors.college} />
+              </div>
+              <div>
+                <input
+                  className={`input ${educationErrors.year ? "hasError" : ""}`}
+                  value={educationForm.year}
+                  onChange={(e) => onEducationChange("year", e.target.value)}
+                  placeholder="Year (e.g., 2024)"
+                />
+                <ErrorMessage message={educationErrors.year} />
+              </div>
             </div>
 
             <button className="btn" onClick={addEducation} style={{ marginTop: 12 }}>
@@ -388,7 +581,7 @@ export default function App() {
                   {e._id && (
                     <button
                       className="btn btnDanger"
-                      onClick={() => deleteEducation(e._id)}
+                      onClick={() => deleteEducation(e._id, e.degree, e.college)}
                     >
                       Delete
                     </button>
@@ -473,44 +666,47 @@ export default function App() {
             </div>
 
             <div className="row2">
-              <input
-                className="input"
-                value={projectForm.name}
-                onChange={(e) =>
-                  setProjectForm((prev) => ({ ...prev, name: e.target.value }))
-                }
-                placeholder="Project Name"
-              />
-              <input
-                className="input"
-                value={projectForm.link}
-                onChange={(e) =>
-                  setProjectForm((prev) => ({ ...prev, link: e.target.value }))
-                }
-                placeholder="Project Link (optional)"
-                type="url"
-              />
+              <div>
+                <input
+                  className={`input ${projectErrors.name ? "hasError" : ""}`}
+                  value={projectForm.name}
+                  onChange={(e) => onProjectChange("name", e.target.value)}
+                  placeholder="Project Name"
+                />
+                <ErrorMessage message={projectErrors.name} />
+              </div>
+              <div>
+                <input
+                  className={`input ${projectErrors.link ? "hasError" : ""}`}
+                  value={projectForm.link}
+                  onChange={(e) => onProjectChange("link", e.target.value)}
+                  placeholder="Project Link (optional)"
+                  type="url"
+                />
+                <ErrorMessage message={projectErrors.link} />
+              </div>
             </div>
 
-            <input
-              className="input"
-              value={projectForm.description}
-              onChange={(e) =>
-                setProjectForm((prev) => ({ ...prev, description: e.target.value }))
-              }
-              placeholder="Description"
-              style={{ marginTop: 10 }}
-            />
+            <div style={{ marginTop: 10 }}>
+              <textarea
+                className={`textarea ${projectErrors.description ? "hasError" : ""}`}
+                value={projectForm.description}
+                onChange={(e) => onProjectChange("description", e.target.value)}
+                placeholder="Description"
+                style={{ minHeight: "80px" }}
+              />
+              <ErrorMessage message={projectErrors.description} />
+            </div>
 
-            <input
-              className="input"
-              value={projectForm.techStack}
-              onChange={(e) =>
-                setProjectForm((prev) => ({ ...prev, techStack: e.target.value }))
-              }
-              placeholder="Tech Stack (comma separated) e.g. Node.js, Express, MongoDB"
-              style={{ marginTop: 10 }}
-            />
+            <div style={{ marginTop: 10 }}>
+              <input
+                className={`input ${projectErrors.techStack ? "hasError" : ""}`}
+                value={projectForm.techStack}
+                onChange={(e) => onProjectChange("techStack", e.target.value)}
+                placeholder="Tech Stack (comma separated) e.g. Node.js, Express, MongoDB"
+              />
+              <ErrorMessage message={projectErrors.techStack} />
+            </div>
 
             <button className="btn" onClick={addProject} style={{ marginTop: 12 }}>
               Add Project
@@ -540,7 +736,7 @@ export default function App() {
                   {p._id && (
                     <button
                       className="btn btnDanger"
-                      onClick={() => deleteProject(p._id)}
+                      onClick={() => deleteProject(p._id, p.name)}
                     >
                       Delete
                     </button>
