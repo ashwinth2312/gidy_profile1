@@ -1,10 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import "./App.css";
+import { ThemeContext } from "./ThemeContext";
+import { StatsCard } from "./components/StatsCard";
 
 const emptyEducation = { degree: "", college: "", year: "" };
 const emptyProject = { name: "", description: "", techStack: "", link: "" };
 
+const API_BASE = "/api/profile";
+
 export default function App() {
+  const { isDark, toggleTheme } = useContext(ThemeContext);
   const [loading, setLoading] = useState(true);
   const [savingMsg, setSavingMsg] = useState("");
 
@@ -20,15 +25,16 @@ export default function App() {
 
   const [educationForm, setEducationForm] = useState(emptyEducation);
   const [projectForm, setProjectForm] = useState(emptyProject);
-
   const [educationList, setEducationList] = useState([]);
   const [projectsList, setProjectsList] = useState([]);
 
-  
+  // Fetch initial profile data
   useEffect(() => {
-    fetch("/api/profile")
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch(API_BASE);
+        const data = await res.json();
+
         setProfile({
           fullName: data.fullName || "",
           email: data.email || "",
@@ -45,24 +51,45 @@ export default function App() {
 
         setEducationList(data.education || []);
         setProjectsList(data.projects || []);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }
+    };
+
+    fetchProfile();
   }, []);
 
-  const onChange = (e) =>
-    setProfile((p) => ({ ...p, [e.target.name]: e.target.value }));
+  const showSaveMessage = async (promise) => {
+    setSavingMsg("Saving...");
+    try {
+      const result = await promise;
+      setSavingMsg("Saved ✅");
+      setTimeout(() => setSavingMsg(""), 1200);
+      return result;
+    } catch (error) {
+      setSavingMsg("Error ❌");
+      console.error(error);
+      setTimeout(() => setSavingMsg(""), 1200);
+      throw error;
+    }
+  };
+
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setProfile((prev) => ({ ...prev, [name]: value }));
+  };
 
   const onLinkChange = (e) => {
-    setProfile((p) => ({
-      ...p,
-      links: { ...p.links, [e.target.name]: e.target.value },
+    const { name, value } = e.target;
+    setProfile((prev) => ({
+      ...prev,
+      links: { ...prev.links, [name]: value },
     }));
   };
 
-  const saveProfile = async () => {
-    setSavingMsg("Saving...");
-
+  const saveProfile = () => {
     const payload = {
       fullName: profile.fullName.trim(),
       email: profile.email.trim(),
@@ -80,48 +107,47 @@ export default function App() {
       },
     };
 
-    const res = await fetch("/api/profile", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await res.json();
-    setEducationList(data.education || educationList);
-    setProjectsList(data.projects || projectsList);
-
-    setSavingMsg("Saved ✅");
-    setTimeout(() => setSavingMsg(""), 1200);
+    showSaveMessage(
+      fetch(API_BASE, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }).then((res) => res.json())
+    );
   };
 
-  const addEducation = async () => {
+  const addEducation = () => {
     if (
       !educationForm.degree.trim() ||
       !educationForm.college.trim() ||
       !educationForm.year.trim()
     ) {
-      alert("Fill Degree, College, Year first");
+      alert("Please fill in Degree, College, and Year");
       return;
     }
 
-    const res = await fetch("/api/profile/education", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        degree: educationForm.degree.trim(),
-        college: educationForm.college.trim(),
-        year: educationForm.year.trim(),
-      }),
-    });
-
-    const data = await res.json();
-    setEducationList(data.education || []);
-    setEducationForm(emptyEducation);
+    showSaveMessage(
+      fetch(`${API_BASE}/education`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          degree: educationForm.degree.trim(),
+          college: educationForm.college.trim(),
+          year: educationForm.year.trim(),
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setEducationList(data.education || []);
+          setEducationForm(emptyEducation);
+          return data;
+        })
+    );
   };
 
-  const addProject = async () => {
+  const addProject = () => {
     if (!projectForm.name.trim() || !projectForm.description.trim()) {
-      alert("Fill Project Name and Description");
+      alert("Please fill in Project Name and Description");
       return;
     }
 
@@ -135,31 +161,49 @@ export default function App() {
       link: projectForm.link.trim(),
     };
 
-    const res = await fetch("/api/profile/projects", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await res.json();
-    setProjectsList(data.projects || []);
-    setProjectForm(emptyProject);
+    showSaveMessage(
+      fetch(`${API_BASE}/projects`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setProjectsList(data.projects || []);
+          setProjectForm(emptyProject);
+          return data;
+        })
+    );
   };
 
-  const deleteEducation = async (eduId) => {
-    const res = await fetch(`/api/profile/education/${eduId}`, {
-      method: "DELETE",
-    });
-    const data = await res.json();
-    setEducationList(data.education || []);
+  const deleteEducation = (eduId) => {
+    if (!window.confirm("Are you sure you want to delete this education?")) return;
+
+    showSaveMessage(
+      fetch(`${API_BASE}/education/${eduId}`, {
+        method: "DELETE",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setEducationList(data.education || []);
+          return data;
+        })
+    );
   };
 
-  const deleteProject = async (projectId) => {
-    const res = await fetch(`/api/profile/projects/${projectId}`, {
-      method: "DELETE",
-    });
-    const data = await res.json();
-    setProjectsList(data.projects || []);
+  const deleteProject = (projectId) => {
+    if (!window.confirm("Are you sure you want to delete this project?")) return;
+
+    showSaveMessage(
+      fetch(`${API_BASE}/projects/${projectId}`, {
+        method: "DELETE",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setProjectsList(data.projects || []);
+          return data;
+        })
+    );
   };
 
   if (loading) return <h2 style={{ padding: 20 }}>Loading...</h2>;
@@ -173,18 +217,23 @@ export default function App() {
             <h1 className="h1">Profile Builder</h1>
           </div>
         </div>
+        <button
+          className="btn themeToggle"
+          onClick={toggleTheme}
+          title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          aria-label="Toggle theme"
+        >
+          {isDark ? "☀️" : "🌙"}
+        </button>
         <div className="toast">{savingMsg}</div>
       </div>
 
-      
       <div className="layout">
-        
         <div className="stack">
-        
+          {/* Profile Details Card */}
           <div className="card">
             <div className="cardTitle">
               <h2>Profile Details</h2>
-              <span className="badge">GET + PUT</span>
             </div>
 
             <div className="row2">
@@ -208,6 +257,7 @@ export default function App() {
                 value={profile.email}
                 onChange={onChange}
                 placeholder="Email"
+                type="email"
               />
               <input
                 className="input"
@@ -215,6 +265,7 @@ export default function App() {
                 value={profile.phone}
                 onChange={onChange}
                 placeholder="Phone"
+                type="tel"
               />
             </div>
 
@@ -240,9 +291,9 @@ export default function App() {
 
             <hr className="hr" />
 
+            {/* Links Section */}
             <div className="cardTitle">
               <h2>Links</h2>
-              <span className="badge">github / linkedin</span>
             </div>
 
             <div className="row2">
@@ -252,6 +303,7 @@ export default function App() {
                 value={profile.links.github}
                 onChange={onLinkChange}
                 placeholder="GitHub URL"
+                type="url"
               />
               <input
                 className="input"
@@ -259,6 +311,7 @@ export default function App() {
                 value={profile.links.linkedin}
                 onChange={onLinkChange}
                 placeholder="LinkedIn URL"
+                type="url"
               />
             </div>
 
@@ -268,6 +321,7 @@ export default function App() {
               value={profile.links.portfolio}
               onChange={onLinkChange}
               placeholder="Portfolio URL (optional)"
+              type="url"
               style={{ marginTop: 10 }}
             />
 
@@ -280,11 +334,10 @@ export default function App() {
             </button>
           </div>
 
-        
+          {/* Education Card */}
           <div className="card">
             <div className="cardTitle">
               <h2>Education</h2>
-              <span className="badge">ADD + DELETE</span>
             </div>
 
             <div className="row3">
@@ -292,7 +345,7 @@ export default function App() {
                 className="input"
                 value={educationForm.degree}
                 onChange={(e) =>
-                  setEducationForm((x) => ({ ...x, degree: e.target.value }))
+                  setEducationForm((prev) => ({ ...prev, degree: e.target.value }))
                 }
                 placeholder="Degree"
               />
@@ -300,7 +353,7 @@ export default function App() {
                 className="input"
                 value={educationForm.college}
                 onChange={(e) =>
-                  setEducationForm((x) => ({ ...x, college: e.target.value }))
+                  setEducationForm((prev) => ({ ...prev, college: e.target.value }))
                 }
                 placeholder="College"
               />
@@ -308,7 +361,7 @@ export default function App() {
                 className="input"
                 value={educationForm.year}
                 onChange={(e) =>
-                  setEducationForm((x) => ({ ...x, year: e.target.value }))
+                  setEducationForm((prev) => ({ ...prev, year: e.target.value }))
                 }
                 placeholder="Year"
               />
@@ -345,13 +398,11 @@ export default function App() {
           </div>
         </div>
 
-      
         <div className="stack">
-        
+          {/* Preview Card */}
           <div className="card">
             <div className="cardTitle">
               <h2>Quick Preview</h2>
-              <span className="badge">UI only</span>
             </div>
 
             <p className="itemTitle" style={{ margin: 0 }}>
@@ -407,15 +458,17 @@ export default function App() {
             </div>
 
             <hr className="hr" />
-            <p className="small">Education items: {educationList.length}</p>
-            <p className="small">Projects items: {projectsList.length}</p>
+
+            <StatsCard 
+              educationCount={educationList.length} 
+              projectsCount={projectsList.length} 
+            />
           </div>
 
-        
+          {/* Projects Card */}
           <div className="card">
             <div className="cardTitle">
               <h2>Projects</h2>
-              <span className="badge">ADD + DELETE</span>
             </div>
 
             <div className="row2">
@@ -423,7 +476,7 @@ export default function App() {
                 className="input"
                 value={projectForm.name}
                 onChange={(e) =>
-                  setProjectForm((x) => ({ ...x, name: e.target.value }))
+                  setProjectForm((prev) => ({ ...prev, name: e.target.value }))
                 }
                 placeholder="Project Name"
               />
@@ -431,9 +484,10 @@ export default function App() {
                 className="input"
                 value={projectForm.link}
                 onChange={(e) =>
-                  setProjectForm((x) => ({ ...x, link: e.target.value }))
+                  setProjectForm((prev) => ({ ...prev, link: e.target.value }))
                 }
                 placeholder="Project Link (optional)"
+                type="url"
               />
             </div>
 
@@ -441,7 +495,7 @@ export default function App() {
               className="input"
               value={projectForm.description}
               onChange={(e) =>
-                setProjectForm((x) => ({ ...x, description: e.target.value }))
+                setProjectForm((prev) => ({ ...prev, description: e.target.value }))
               }
               placeholder="Description"
               style={{ marginTop: 10 }}
@@ -451,7 +505,7 @@ export default function App() {
               className="input"
               value={projectForm.techStack}
               onChange={(e) =>
-                setProjectForm((x) => ({ ...x, techStack: e.target.value }))
+                setProjectForm((prev) => ({ ...prev, techStack: e.target.value }))
               }
               placeholder="Tech Stack (comma separated) e.g. Node.js, Express, MongoDB"
               style={{ marginTop: 10 }}
@@ -470,7 +524,7 @@ export default function App() {
                     <p className="itemMeta">
                       Tech: {(p.techStack || []).join(", ")}
                     </p>
-                    {p.link ? (
+                    {p.link && (
                       <a
                         className="link"
                         href={p.link}
@@ -479,7 +533,7 @@ export default function App() {
                       >
                         Link
                       </a>
-                    ) : null}
+                    )}
                   </div>
 
                   {p._id && (
