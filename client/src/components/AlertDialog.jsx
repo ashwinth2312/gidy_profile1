@@ -1,49 +1,114 @@
 import { useContext } from "react";
 import { ThemeContext } from "../ThemeContext";
-import "../styles/AlertDialog.css";
+import "./AlertDialog.css";
 
-export function AlertDialog({ 
-  isOpen, 
-  title, 
-  message, 
-  type = "info", 
-  onConfirm, 
-  onCancel,
+export const AlertDialog = ({
+  isOpen,
+  title,
+  message,
+  type = "info",
   confirmText = "Confirm",
-  cancelText = "Cancel"
-}) {
-  const { isDark } = useContext(ThemeContext);
-
+  cancelText = "Cancel",
+  onConfirm,
+  onCancel,
+}) => {
   if (!isOpen) return null;
 
+  const getAlertStyles = () => {
+    switch (type) {
+      case "danger":
+        return {
+          borderColor: "#ef4444",
+          titleColor: "#dc2626",
+          iconBg: "#fee2e2",
+          iconColor: "#dc2626",
+          confirmBg: "#ef4444",
+          confirmHover: "#dc2626",
+        };
+      case "success":
+        return {
+          borderColor: "#10b981",
+          titleColor: "#059669",
+          iconBg: "#d1fae5",
+          iconColor: "#059669",
+          confirmBg: "#10b981",
+          confirmHover: "#059669",
+        };
+      case "warning":
+        return {
+          borderColor: "#f59e0b",
+          titleColor: "#d97706",
+          iconBg: "#fef3c7",
+          iconColor: "#d97706",
+          confirmBg: "#f59e0b",
+          confirmHover: "#d97706",
+        };
+      default: // info
+        return {
+          borderColor: "#3b82f6",
+          titleColor: "#1d4ed8",
+          iconBg: "#dbeafe",
+          iconColor: "#1d4ed8",
+          confirmBg: "#3b82f6",
+          confirmHover: "#1d4ed8",
+        };
+    }
+  };
+
+  const styles = getAlertStyles();
+
+  const getAlertIcon = () => {
+    switch (type) {
+      case "danger":
+        return "❌";
+      case "success":
+        return "✅";
+      case "warning":
+        return "⚠️";
+      default:
+        return "ℹ️";
+    }
+  };
+
   return (
-    <div className="alertOverlay">
-      <div className={`alertDialog alertDialog-${type}`}>
+    <div className="alertOverlay" onClick={onCancel}>
+      <div
+        className="alertDialog"
+        onClick={(e) => e.stopPropagation()}
+        style={{ borderColor: styles.borderColor }}
+      >
         <div className="alertHeader">
-          <h3 className="alertTitle">{title}</h3>
-          <button 
-            className="alertClose" 
-            onClick={onCancel}
-            aria-label="Close dialog"
+          <div
+            className="alertIcon"
+            style={{ backgroundColor: styles.iconBg, color: styles.iconColor }}
           >
-            ✕
-          </button>
+            {getAlertIcon()}
+          </div>
+          <h2 className="alertTitle" style={{ color: styles.titleColor }}>
+            {title}
+          </h2>
         </div>
 
-        <div className="alertBody">
-          <p className="alertMessage">{message}</p>
-        </div>
+        <p className="alertMessage">{message}</p>
 
-        <div className="alertFooter">
-          <button 
-            className="alertBtn alertBtnCancel" 
-            onClick={onCancel}
-          >
-            {cancelText}
-          </button>
-          <button 
-            className={`alertBtn alertBtnConfirm alertBtnConfirm-${type}`}
+        <div className="alertActions">
+          {type !== "success" && (
+            <button className="btn btnCancel" onClick={onCancel}>
+              {cancelText}
+            </button>
+          )}
+          <button
+            className="btn btnConfirm"
             onClick={onConfirm}
+            style={{
+              backgroundColor: styles.confirmBg,
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = styles.confirmHover;
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = styles.confirmBg;
+            }}
           >
             {confirmText}
           </button>
@@ -51,4 +116,4 @@ export function AlertDialog({
       </div>
     </div>
   );
-}
+};

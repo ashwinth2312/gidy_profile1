@@ -1,0 +1,192 @@
+.iconSpan {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: inherit;
+  transition: all 0.2s ease;
+}
+
+/* User Icon */
+.iconUser {
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+}
+
+/* Mail Icon */
+.iconMail {
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+}
+
+/* Phone Icon */
+.iconPhone {
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+}
+
+/* Map Pin Icon */
+.iconMapPin {
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+}
+
+/* Globe Icon */
+.iconGlobe {
+  animation: globeFloat 3s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+}
+
+@keyframes globeFloat {
+  0%, 100% {
+    transform: translateY(0) rotateY(0deg);
+  }
+  50% {
+    transform: translateY(-3px) rotateY(10deg);
+  }
+}
+
+/* Github Icon */
+.iconGithub {
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+  transition: all 0.2s ease;
+}
+
+.iconGithub:hover {
+  filter: drop-shadow(0 4px 8px rgba(79, 70, 229, 0.4));
+  transform: scale(1.1);
+}
+
+/* LinkedIn Icon */
+.iconLinkedin {
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+  transition: all 0.2s ease;
+}
+
+.iconLinkedin:hover {
+  filter: drop-shadow(0 4px 8px rgba(79, 70, 229, 0.4));
+  transform: scale(1.1);
+}
+
+/* Code Icon */
+.iconCode {
+  animation: codeFlash 2s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+}
+
+@keyframes codeFlash {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Book Icon */
+.iconBook {
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+}
+
+/* Calendar Icon */
+.iconCalendar {
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+}
+
+/* File Text Icon */
+.iconFileText {
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+}
+
+/* Edit Icon */
+.iconEdit {
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+  transition: all 0.2s ease;
+}
+
+.iconEdit:hover {
+  transform: rotate(15deg);
+  filter: drop-shadow(0 4px 8px rgba(79, 70, 229, 0.4));
+}
+
+/* Briefcase Icon */
+.iconBriefcase {
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+}
+
+/* Zap Icon */
+.iconZap {
+  animation: zapFlash 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 2px 6px rgba(249, 191, 36, 0.4));
+}
+
+@keyframes zapFlash {
+  0%, 100% {
+    filter: drop-shadow(0 2px 6px rgba(249, 191, 36, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 4px 12px rgba(249, 191, 36, 0.7));
+  }
+}
+
+/* Link Icon */
+.iconLink {
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+  transition: all 0.2s ease;
+}
+
+.iconLink:hover {
+  transform: rotate(-45deg) scale(1.1);
+}
+
+/* Help Icon */
+.iconHelp {
+  animation: helpBounce 1s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+}
+
+@keyframes helpBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Settings Icon */
+.iconSettings {
+  animation: settingsSpin 4s linear infinite;
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+}
+
+@keyframes settingsSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Image Icon */
+.iconImage {
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+}
+
+/* Plus Icon */
+.iconPlus {
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+  transition: all 0.2s ease;
+}
+
+.iconPlus:hover {
+  transform: rotate(90deg) scale(1.1);
+  filter: drop-shadow(0 4px 8px rgba(79, 70, 229, 0.4));
+}
+
+/* External Link Icon */
+.iconExternal {
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.2));
+  transition: all 0.2s ease;
+}
+
+.iconExternal:hover {
+  transform: translate(2px, -2px);
+  filter: drop-shadow(0 4px 8px rgba(79, 70, 229, 0.4));
+}

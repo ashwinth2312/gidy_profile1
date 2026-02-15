@@ -1,0 +1,310 @@
+.appBar {
+  background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.appBar:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.appBarContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+  gap: 32px;
+  height: 72px;
+}
+
+/* Left Section */
+.appBarLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.logoWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.appBarTitle {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.appBarMainTitle {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.appBarSubtitle {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Center Section */
+.appBarCenter {
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+}
+
+.statusBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(79, 70, 229, 0.08);
+  border: 1px solid rgba(79, 70, 229, 0.2);
+  border-radius: 20px;
+  transition: all 0.2s ease;
+}
+
+.statusBadge:hover {
+  background: rgba(79, 70, 229, 0.12);
+  border-color: rgba(79, 70, 229, 0.3);
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  background: #4f46e5;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(79, 70, 229, 0.6);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(79, 70, 229, 0.6);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 12px rgba(79, 70, 229, 0.8);
+  }
+}
+
+.statusText {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4f46e5;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+/* Right Section */
+.appBarRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.appBarButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.appBarButton::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  border-radius: 8px;
+}
+
+.appBarButton:hover {
+  color: #4f46e5;
+  background: rgba(79, 70, 229, 0.08);
+}
+
+.appBarButton:hover::before {
+  opacity: 1;
+}
+
+.appBarButton:active {
+  transform: scale(0.95);
+}
+
+.appBarDivider {
+  width: 1px;
+  height: 24px;
+  background: var(--border-color);
+  border-left: 1px solid var(--border-color);
+}
+
+/* Bottom Accent Line */
+.appBarAccent {
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    #4f46e5 0%,
+    #7c3aed 50%,
+    transparent 100%
+  );
+  opacity: 0.6;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .appBarContent {
+    padding: 14px 24px;
+    gap: 20px;
+    height: 68px;
+  }
+
+  .appBarMainTitle {
+    font-size: 18px;
+  }
+
+  .appBarSubtitle {
+    font-size: 11px;
+  }
+
+  .statusText {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .appBar {
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .appBarContent {
+    flex-wrap: wrap;
+    padding: 12px 18px;
+    gap: 16px;
+    height: auto;
+  }
+
+  .appBarLeft {
+    order: 1;
+    flex: 1 1 100%;
+    gap: 12px;
+  }
+
+  .appBarCenter {
+    order: 3;
+    flex: 1 1 auto;
+  }
+
+  .appBarRight {
+    order: 2;
+    flex-shrink: 0;
+    gap: 8px;
+  }
+
+  .appBarMainTitle {
+    font-size: 16px;
+  }
+
+  .appBarSubtitle {
+    display: none;
+  }
+
+  .statusBadge {
+    padding: 4px 10px;
+  }
+
+  .statusDot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .appBarButton {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .appBarContent {
+    padding: 10px 14px;
+    gap: 12px;
+  }
+
+  .appBarTitleWrapper {
+    gap: 8px;
+  }
+
+  .appBarMainTitle {
+    font-size: 14px;
+  }
+
+  .appBarButton {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .appBarDivider {
+    display: none;
+  }
+
+  .statusBadge {
+    display: none;
+  }
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .appBar {
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+}
+
+[data-theme="light"] .appBar {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}

@@ -5,7 +5,6 @@ export function ErrorMessage({ message }) {
 
   return (
     <div className="errorMessage">
-      <span className="errorIcon">⚠️</span>
       <span className="errorText">{message}</span>
     </div>
   );

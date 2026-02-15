@@ -1,0 +1,50 @@
+.inputGroup {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  pointer-events: none;
+  transition: color 0.2s;
+  width: 18px;
+  height: 18px;
+}
+
+.inputGroup:focus-within .inputIcon {
+  color: var(--text-primary);
+}
+
+.inputWithIcon {
+  padding-left: 42px !important;
+}
+
+.textareaWithIcon {
+  padding-left: 42px !important;
+}
+
+.inputGroup.hasError .inputIcon {
+  color: #ef4444;
+}
+
+.requiredLabel {
+  color: #ef4444;
+  margin-left: 4px;
+  font-weight: 600;
+}
+
+.fieldLabel {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}

@@ -1,41 +1,68 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const profileSchema = new mongoose.Schema(
   {
-    fullName: { type: String, required: true, trim: true },
-    email: { type: String, required: true, trim: true },
-    phone: { type: String, trim: true },
-
-    title: { type: String, trim: true }, 
-    summary: { type: String, trim: true },
-
-    skills: [{ type: String, trim: true }],
-
-    
-    links: {
-      github: { type: String, trim: true },
-      linkedin: { type: String, trim: true },
-      portfolio: { type: String, trim: true }
+    fullName: {
+      type: String,
+      default: "",
     },
-
+    email: {
+      type: String,
+      default: "",
+    },
+    phone: {
+      type: String,
+      default: "",
+    },
+    title: {
+      type: String,
+      default: "",
+    },
+    summary: {
+      type: String,
+      default: "",
+    },
+    profilePicture: {
+      type: String,
+      default: null,
+    },
+    links: {
+      github: {
+        type: String,
+        default: "",
+      },
+      linkedin: {
+        type: String,
+        default: "",
+      },
+      portfolio: {
+        type: String,
+        default: "",
+      },
+    },
     education: [
       {
-        degree: { type: String, trim: true },
-        college: { type: String, trim: true },
-        year: { type: String, trim: true }
-      }
+        degree: String,
+        college: String,
+        year: String,
+      },
     ],
-
     projects: [
       {
-        name: { type: String, trim: true },
-        description: { type: String, trim: true },
-        techStack: [{ type: String, trim: true }],
-        link: { type: String, trim: true }
-      }
-    ]
+        name: String,
+        description: String,
+        techStack: [String],
+        link: String,
+      },
+    ],
+    skills: [
+      {
+        name: String,
+        rating: Number,
+      },
+    ],
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Profile", profileSchema);
+export default mongoose.model("Profile", profileSchema);

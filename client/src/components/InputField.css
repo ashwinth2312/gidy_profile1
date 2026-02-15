@@ -1,0 +1,145 @@
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.inputLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.inputIcon {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.required {
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.input {
+  padding: 10px 12px;
+  font-size: 13px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: inherit;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  background-color: var(--bg-secondary);
+}
+
+.input:hover:not(:focus) {
+  border-color: rgba(79, 70, 229, 0.3);
+}
+
+.input.hasError {
+  border-color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+.input.hasError:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+}
+
+.input.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--bg-tertiary);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+  padding: 10px 12px;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.errorMessage {
+  font-size: 12px;
+  color: #ef4444;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  background-color: rgba(239, 68, 68, 0.05);
+  border-left: 3px solid #ef4444;
+  border-radius: 2px;
+}
+
+.errorMessage::before {
+  content: "⚠";
+  font-size: 11px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .inputLabel {
+    font-size: 12px;
+  }
+
+  .input {
+    font-size: 13px;
+    padding: 9px 11px;
+  }
+
+  .textarea {
+    min-height: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .inputContainer {
+    gap: 5px;
+  }
+
+  .inputLabel {
+    font-size: 11px;
+  }
+
+  .input {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+
+  .textarea {
+    min-height: 60px;
+    padding: 8px 10px;
+  }
+
+  .errorMessage {
+    font-size: 11px;
+    padding: 5px 6px;
+  }
+}

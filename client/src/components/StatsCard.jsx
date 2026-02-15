@@ -1,24 +1,19 @@
 import "../styles/StatsCard.css";
 
-export function StatsCard({ educationCount, projectsCount }) {
+export function StatsCard({ educationCount = 0, projectsCount = 0, skillsCount = 0 }) {
   return (
-    <div className="statsContainer">
+    <div className="statsGrid">
       <div className="statItem">
-        <div className="statIcon">🎓</div>
-        <div className="statContent">
-          <p className="statLabel">Education</p>
-          <p className="statValue">{educationCount}</p>
-        </div>
+        <div className="statValue">{educationCount}</div>
+        <div className="statLabel">Education</div>
       </div>
-
-      <div className="statDivider"></div>
-
       <div className="statItem">
-        <div className="statIcon">💻</div>
-        <div className="statContent">
-          <p className="statLabel">Projects</p>
-          <p className="statValue">{projectsCount}</p>
-        </div>
+        <div className="statValue">{projectsCount}</div>
+        <div className="statLabel">Projects</div>
+      </div>
+      <div className="statItem">
+        <div className="statValue">{skillsCount}</div>
+        <div className="statLabel">Skills</div>
       </div>
     </div>
   );

@@ -1,0 +1,76 @@
+.themeToggleButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.themeToggleButton::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), transparent);
+  opacity: 0;
+  border-radius: 8px;
+  transition: opacity 0.2s ease;
+}
+
+.themeToggleButton:hover {
+  background: rgba(79, 70, 229, 0.08);
+  color: #4f46e5;
+}
+
+.themeToggleButton:hover::before {
+  opacity: 1;
+}
+
+.themeToggleButton:active {
+  transform: scale(0.95);
+}
+
+.themeToggleIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: themeSwitch 0.3s ease;
+}
+
+@keyframes themeSwitch {
+  0% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: rotate(180deg) scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .themeToggleButton {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .themeToggleButton {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+}
