@@ -1,11 +1,8 @@
 import { useEffect, useState, useContext } from "react";
 import "./App.css";
 import { ThemeContext } from "./ThemeContext";
-import { StatsCard } from "./components/StatsCard";
 import { AlertDialog } from "./components/AlertDialog";
 import { Modal } from "./components/Modal";
-import { Avatar } from "./components/Avatar";
-import { ThemeToggle } from "./components/ThemeToggle";
 import { InputField, TextAreaField } from "./components/InputField";
 import { useValidation } from "./hooks/useValidation";
 import Icons from "./components/Icons";
