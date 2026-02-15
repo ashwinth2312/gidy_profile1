@@ -142,7 +142,7 @@ body {
 
 .previewTitle {
   margin: 0;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
   flex: 1;
@@ -704,12 +704,12 @@ body {
 
   .previewHeader,
   .previewHeaderWithAdd {
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
   }
 
   .btnManagePreview {
-    width: 100%;
+    width: auto;
     justify-content: center;
   }
 
