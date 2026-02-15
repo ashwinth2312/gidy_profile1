@@ -1,4 +1,4 @@
-<img width="818" height="667" alt="image" src="https://github.com/user-attachments/assets/fec80804-75b9-4b39-9a68-68af36ff96b6" />Profile Builder Application
+Profile Builder Application
 
 Project Overview : 
 
