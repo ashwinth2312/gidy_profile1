@@ -18,8 +18,7 @@ const emptySkill = { name: "", rating: 1 };
 export default function App() {
   const { isDark } = useContext(ThemeContext);
   const { validateProfile, validateEducation, validateProject } = useValidation();
-  const [loading, setLoading] = useState(true);
-
+  const [loading, setLoading] = useState(true)
   // Modal States
   const [modalState, setModalState] = useState({
     profileModal: false,
@@ -372,11 +371,11 @@ export default function App() {
       Object.entries(errors).forEach(([field, error]) => {
         errorMessage += `• ${error}\n`;
       });
-      showAlert(
-        "Validation Error",
-        errorMessage,
-        "danger"
-      );
+      // showAlert(
+      //   "Validation Error",
+      //   errorMessage,
+      //   "danger"
+      // );
       return;
     }
 
@@ -1094,27 +1093,30 @@ export default function App() {
           <div className="card previewCard">
             <div className="previewSection">
               <div className="previewHeader">
-                <span className="previewIcon">{Icons.User}</span>
+                <span className="previewIcon">{Icons.Details}</span>
                 <h3 className="previewTitle">Profile</h3>
                 <button className="btn btnManagePreview" onClick={handleEditProfile}>
                   {Icons.Edit} Edit
                 </button>
               </div>
 
-              <div style={{ display: "flex", gap: 16, alignItems: "flex-start", marginTop: 12 }}>
+              <div style={{ display: "flex", gap: 2, alignItems: "flex-start", marginTop: 12 }}>
                 <div style={{ flex: 1 }}>
                   <p className="itemTitle" style={{ margin: 0 }}>
-                    {profile.fullName || "Your Name"}
+                    {Icons.User} {profile.fullName || "Your Name"}
+                  </p>
+                   <p className="itemMeta" style={{ marginTop: 6 }}>
+                    {Icons.FileText} {profile.summary || "Your short summary will show here."}
                   </p>
                   <p className="itemMeta" style={{ marginTop: 6 }}>
-                    {profile.title || "Your Title"} <br />
-                    {profile.email || "you@email.com"}{" "}
-                    {profile.phone ? ` • ${profile.phone}` : ""}
+                    {Icons.Briefcase} {profile.title || "Your Title"} <br />
                   </p>
-                  <p className="itemMeta">
-                    {profile.summary || "Your short summary will show here."}
+                   <p className="itemMeta" style={{ marginTop: 6 }}>
+                    {Icons.Phone} {profile.phone ? `  ${profile.phone}` : ""}
                   </p>
-
+                     <p className="itemMeta" style={{ marginTop: 6 }}>
+                    {Icons.Mail} {profile.email || "you@email.com"}
+                  </p>
                   <div
                     style={{
                       display: "flex",
@@ -1186,7 +1188,7 @@ export default function App() {
               <div className="previewSection">
                 <div className="previewHeader">
                   <span className="previewIcon">{Icons.Book}</span>
-                  <h3 className="previewTitle">Education ({educationList.length})</h3>
+                  <h3 className="previewTitle">Education [ {educationList.length} ]</h3>
                   <button className="btn btnManagePreview" onClick={() => openModal("educationModal")}>
                     {Icons.Edit} Manage
                   </button>
@@ -1208,7 +1210,7 @@ export default function App() {
                 <div className="previewHeaderWithAdd">
                   <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
                     <span className="previewIcon">{Icons.Code}</span>
-                    <h3 className="previewTitle">Projects ({projectsList.length})</h3>
+                    <h3 className="previewTitle">Projects [ {projectsList.length} ]</h3>
                   </div>
                   <button className="btn btnManagePreview" onClick={() => openModal("projectModal")}>
                     {Icons.Edit} Manage
@@ -1253,7 +1255,7 @@ export default function App() {
                 <div className="previewHeaderWithAdd">
                   <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
                     <span className="previewIcon">{Icons.Zap}</span>
-                    <h3 className="previewTitle">Skills ({skillsList.length})</h3>
+                    <h3 className="previewTitle">Skills [ {skillsList.length} ]</h3>
                   </div>
                   <button className="btn btnManagePreview" onClick={() => openModal("skillModal")}>
                     {Icons.Edit} Manage

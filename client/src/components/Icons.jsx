@@ -2,6 +2,7 @@ import "./Icons.css";
 
 const Icons = {
   User: <span className="iconSpan iconUser">👤</span>,
+  Details: <span className="iconSpan iconDetails">📋</span>,
   Mail: <span className="iconSpan iconMail">📧</span>,
   Phone: <span className="iconSpan iconPhone">📱</span>,
   MapPin: <span className="iconSpan iconMapPin">📍</span>,
