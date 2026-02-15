@@ -219,55 +219,39 @@
 }
 
 @media (max-width: 768px) {
-  .appBar {
-    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
-  }
-
   .appBarContent {
-    flex-wrap: wrap;
-    padding: 12px 18px;
-    gap: 16px;
-    height: auto;
+    flex-wrap: nowrap;      /* ✅ keep in one row */
+    height: 60px;           /* ✅ fixed height */
+    padding: 10px 14px;
+    gap: 10px;
   }
 
   .appBarLeft {
-    order: 1;
-    flex: 1 1 100%;
-    gap: 12px;
+    flex: 1;
+    min-width: 0;           /* ✅ allow text to shrink */
+    gap: 10px;
   }
 
-  .appBarCenter {
-    order: 3;
-    flex: 1 1 auto;
-  }
-
-  .appBarRight {
-    order: 2;
-    flex-shrink: 0;
-    gap: 8px;
+  .appBarTitle {
+    min-width: 0;
   }
 
   .appBarMainTitle {
-    font-size: 16px;
+    font-size: 14px;
+    max-width: 160px;       /* ✅ prevent pushing toggle down */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .appBarSubtitle {
     display: none;
   }
 
-  .statusBadge {
-    padding: 4px 10px;
-  }
-
-  .statusDot {
-    width: 6px;
-    height: 6px;
-  }
-
-  .appBarButton {
-    width: 36px;
-    height: 36px;
-    font-size: 16px;
+  .appBarRight {
+    flex-shrink: 0;
+    margin-left: auto;      /* ✅ push toggle to right */
+    gap: 6px;
   }
 }
 

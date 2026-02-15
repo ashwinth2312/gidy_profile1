@@ -22,9 +22,6 @@ export const AppBar = ({ profileName = "Profile Builder" }) => {
             <p className="appBarSubtitle">Create your professional profile</p>
           </div>
         </div>
-
-        
-
         {/* Right Section - Actions */}
         <div className="appBarRight">
         
