@@ -745,10 +745,11 @@ export default function App() {
           <TextAreaField
             icon={Icons.FileText}
             label="Summary"
+            name={"summary"}
             required
             error={profileErrors.summary}
             value={profile.summary}
-            onChange={onChange}
+            onChange={(e) => onChange({ target: { name: "summary", value: e.target.value } })}
             placeholder="Brief introduction about yourself"
             rows={3}
           />
